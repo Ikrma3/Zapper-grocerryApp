@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "317867164121",
+    "project_id": "zapper-8b2c0",
+    "storage_bucket": "zapper-8b2c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317867164121:android:0d518e64b6b7dbcc8819c8",
+        "android_client_info": {
+          "package_name": "com.example.zapper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "317867164121-s8k8o482ednhud80hguq3i86kf5q73u4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zapper",
+            "certificate_hash": "ffa0d6c9c0afb6bc57d3cee80f7a40dcde735bf8"
+          }
+        },
+        {
+          "client_id": "317867164121-hf22tdub9dgbkcih41vmdi0677p0h17c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGWDO0AOesf-eFX7i7NRBXDrFBNGdU6nY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "317867164121-hf22tdub9dgbkcih41vmdi0677p0h17c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "317867164121-cher2pujpgqcrupb87o9aa2q3d2jm5c3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.zapper"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
