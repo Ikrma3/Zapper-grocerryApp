@@ -9,6 +9,7 @@ import 'package:zapper/Components/customTextField.dart';
 import 'package:zapper/Components/errorCheck.dart';
 import 'package:zapper/Components/submitButton.dart';
 import 'package:zapper/Screens/otp.dart';
+import 'package:zapper/config.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -77,8 +78,8 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> sendOTPEmail(String email, String otp) async {
-    final username = 'ikrmaiftikhar3@gmail.com';
-    final password = 'socl rlkv czmp gkyz';
+    final username = Config.email;
+    final password = Config.googleAppId;
     final smtpServer = gmail(username!, password!);
 
     final message = Message()
