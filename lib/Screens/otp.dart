@@ -13,7 +13,8 @@ import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Screens/home.dart';
 import 'dart:convert';
 
-import 'package:zapper/Screens/signup.dart'; // For utf8.encode
+import 'package:zapper/Screens/signup.dart';
+import 'package:zapper/config.dart'; // For utf8.encode
 
 class OTPScreen extends StatefulWidget {
   final String fullName;
@@ -165,8 +166,8 @@ class _OTPScreenState extends State<OTPScreen> {
   }
 
   Future<void> sendOTPEmail(String email, String otp) async {
-    final username = dotenv.env['EMAIL_USERNAME'];
-    final password = dotenv.env['EMAIL_PASSWORD'];
+    final username = Config.email;
+    final password = Config.googleAppId;
     final smtpServer = gmail(username!, password!);
 
     final message = Message()
@@ -273,7 +274,13 @@ class _OTPScreenState extends State<OTPScreen> {
                       SizedBox(height: 24.h),
                       ElevatedButton(
                         onPressed: _isButtonActive ? _resendOtp : null,
-                        child: Text('Resend OTP'),
+                        child: Text(
+                          'Resend OTP',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontFamily: 'Inter'),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,
                         ),

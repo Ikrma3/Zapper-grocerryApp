@@ -9,6 +9,7 @@ import 'package:zapper/Screens/landingScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:zapper/Screens/splashScreen.dart';
 import 'package:provider/provider.dart';
+import 'package:zapper/config.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -17,12 +18,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       options: FirebaseOptions(
-          apiKey: 'AIzaSyAYZbaOVKkb4OvGIj_5O_TTDhCnM8Lzhx8',
-          appId: '1:317867164121:android:0d518e64b6b7dbcc8819c8',
-          iosBundleId: 'com.example.zapper',
-          messagingSenderId: '317867164121',
-          projectId: 'zapper-8b2c0',
-          storageBucket: 'gs://zapper-8b2c0.appspot.com'));
+          apiKey: Config.apiKey,
+          appId: Config.appId,
+          iosBundleId: Config.iosBundleId,
+          messagingSenderId: Config.messagingSenderId,
+          projectId: Config.projectId,
+          storageBucket: Config.storageBucket));
   runApp(MyApp());
 }
 
