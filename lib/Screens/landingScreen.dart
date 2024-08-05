@@ -120,12 +120,14 @@ class LandingScreen extends StatelessWidget {
                           final provider = Provider.of<GooglesigninProvider>(
                               context,
                               listen: false);
-                          bool success = await provider.googleLogin();
-                          if (success) {
+                          String? userEmail = await provider.googleLogin();
+                          if (userEmail != null) {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomeScreen()),
+                                builder: (context) =>
+                                    HomeScreen(userEmail: userEmail),
+                              ),
                             );
                           } else {
                             // Handle sign-in failure

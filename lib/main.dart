@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:zapper/Components/googleSignin.dart';
 import 'package:zapper/Screens/adminPanel.dart';
+import 'package:zapper/Screens/home.dart';
 import 'package:zapper/Screens/landingScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:zapper/Screens/splashScreen.dart';
@@ -41,8 +42,12 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(), // Default light theme
             darkTheme: ThemeData.dark(), // Default dark theme
-            themeMode: ThemeMode.system, // Use the system theme
+            themeMode: ThemeMode.system,
             home: SplashScreen(),
+            // Use the system theme
+            // home: HomeScreen(
+            //   userEmail: 'f190231@nu.edu.pk',
+            // ),
           ),
         );
       },

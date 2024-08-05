@@ -86,6 +86,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
         await categoryRef.set({
           'name': categoryName,
           'imageUrl': imageUrl, // Save the image URL in Firestore
+          'discount': '0',
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -138,69 +139,71 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-            child: Column(
-              children: [
-                _imageFile == null
-                    ? GestureDetector(
-                        onTap: _pickImage,
-                        child: Container(
-                          width: double.infinity,
-                          height: 150.h,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14.r),
-                            color: AppColors.secondaryColor,
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Upload an image",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18.sp,
-                                fontFamily: 'OpenSans',
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _imageFile == null
+                      ? GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            width: double.infinity,
+                            height: 150.h,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14.r),
+                              color: AppColors.secondaryColor,
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Upload an image",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.sp,
+                                  fontFamily: 'OpenSans',
+                                ),
                               ),
                             ),
                           ),
+                        )
+                      : Image.file(
+                          File(_imageFile!.path),
+                          width: double.infinity,
+                          height: 150.h,
+                          fit: BoxFit.cover,
                         ),
-                      )
-                    : Image.file(
-                        File(_imageFile!.path),
-                        width: double.infinity,
-                        height: 150.h,
-                        fit: BoxFit.cover,
+                  SizedBox(height: 20.h),
+                  TextField(
+                    controller: _categoryController,
+                    decoration: InputDecoration(
+                      hintText: 'Category name',
+                      hintStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.sp,
+                        fontFamily: 'OpenSans',
                       ),
-                SizedBox(height: 20.h),
-                TextField(
-                  controller: _categoryController,
-                  decoration: InputDecoration(
-                    hintText: 'Category name',
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13.sp,
-                      fontFamily: 'OpenSans',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r)),
                     ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r)),
                   ),
-                ),
-                SizedBox(height: 330.h),
-                _isLoading
-                    ? CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _submitCategory,
-                        child: Text(
-                          'Submit',
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontFamily: 'Inter',
+                  SizedBox(height: 330.h),
+                  _isLoading
+                      ? CircularProgressIndicator()
+                      : ElevatedButton(
+                          onPressed: _submitCategory,
+                          child: Text(
+                            'Submit',
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors.secondaryColor,
+                            minimumSize: Size(double.infinity, 40.h),
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: AppColors.secondaryColor,
-                          minimumSize: Size(double.infinity, 40.h),
-                        ),
-                      ),
-              ],
+                ],
+              ),
             ),
           ),
         ]),

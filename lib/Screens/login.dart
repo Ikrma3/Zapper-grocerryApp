@@ -66,7 +66,10 @@ class _LoginScreenState extends State<LoginScreen> {
           } else {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(
+                  builder: (context) => HomeScreen(
+                        userEmail: email,
+                      )),
             );
           }
         }
@@ -106,6 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (userCredential.user != null) {
           // Get user email
           String email = userCredential.user!.email!;
+          String userId = userCredential.user!.uid; // Get user ID
 
           if (email == 'admin@zapper.com') {
             // Navigate to Admin Panel if admin email
@@ -114,10 +118,13 @@ class _LoginScreenState extends State<LoginScreen> {
               MaterialPageRoute(builder: (context) => AdminPanel()),
             );
           } else {
-            // Navigate to Home Screen if not admin
+            // Navigate to Home Screen if not admin, passing userId
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(
+                  builder: (context) => HomeScreen(
+                        userEmail: email,
+                      )),
             );
           }
         }

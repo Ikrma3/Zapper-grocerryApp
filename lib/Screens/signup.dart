@@ -21,6 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController AddressController = TextEditingController();
 
   String? emailError;
   String? passwordError;
@@ -61,6 +62,7 @@ class _SignupScreenState extends State<SignupScreen> {
             email: emailController.text,
             phone: phoneController.text,
             password: passwordController.text,
+            Address: AddressController.text,
             otp: otp,
           ),
         ),
@@ -168,6 +170,15 @@ class _SignupScreenState extends State<SignupScreen> {
                         labelText: 'Password',
                         obscureText: true,
                         controller: passwordController,
+                        errorText: passwordError,
+                        keyboardType: TextInputType.visiblePassword,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      SizedBox(height: 15.h),
+                      CustomTextFormField(
+                        labelText: 'Address',
+                        obscureText: false,
+                        controller: AddressController,
                         errorText: passwordError,
                         keyboardType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.next,

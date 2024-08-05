@@ -16,8 +16,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _newPriceController = TextEditingController();
   final TextEditingController _name = TextEditingController();
-  final TextEditingController _previousPriceController =
-      TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _nutritionFactController =
       TextEditingController();
@@ -46,14 +44,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Future<void> _submitProduct() async {
     final name = _name.text.trim();
     final newPrice = _newPriceController.text.trim();
-    final previousPrice = _previousPriceController.text.trim();
     final description = _descriptionController.text.trim();
     final nutritionFact = _nutritionFactController.text.trim();
 
     if (_selectedCategory == null ||
         name.isEmpty ||
         newPrice.isEmpty ||
-        previousPrice.isEmpty ||
         description.isEmpty ||
         nutritionFact.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -85,7 +81,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         'category': _selectedCategory,
         'Name': name,
         'newPrice': newPrice,
-        'previousPrice': previousPrice,
+        'previousPrice': '0',
         'description': description,
         'nutritionFact': nutritionFact,
         'imageUrls': imageUrls,
@@ -102,7 +98,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
         _imageFiles = [];
         _name.clear();
         _newPriceController.clear();
-        _previousPriceController.clear();
         _descriptionController.clear();
         _nutritionFactController.clear();
         _isSpecialOffer = false;
@@ -244,18 +239,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           borderSide:
                               BorderSide(color: AppColors.secondaryColor)),
                       hintText: 'New Price',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                  SizedBox(height: 20.h),
-                  TextField(
-                    controller: _previousPriceController,
-                    decoration: InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.secondaryColor)),
-                      hintText: 'Previous Price',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,

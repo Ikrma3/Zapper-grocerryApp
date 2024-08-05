@@ -11,6 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zapper/Components/background.dart';
 import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Screens/home.dart';
+import 'package:zapper/Screens/login.dart';
 import 'dart:convert';
 
 import 'package:zapper/Screens/signup.dart';
@@ -21,6 +22,7 @@ class OTPScreen extends StatefulWidget {
   final String email;
   final String phone;
   final String password;
+  final String Address;
   String otp;
 
   OTPScreen({
@@ -28,6 +30,7 @@ class OTPScreen extends StatefulWidget {
     required this.email,
     required this.phone,
     required this.password,
+    required this.Address,
     required this.otp,
   });
 
@@ -90,7 +93,8 @@ class _OTPScreenState extends State<OTPScreen> {
       'fullName': widget.fullName,
       'email': widget.email,
       'phone': widget.phone,
-      'password': hashPassword(widget.password), // Hash the password
+      'password': hashPassword(widget.password),
+      'Address': widget.Address, // Hash the password
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -108,7 +112,7 @@ class _OTPScreenState extends State<OTPScreen> {
         await _storeUserData();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       } on FirebaseAuthException catch (e) {
         if (e.code == 'email-already-in-use') {
