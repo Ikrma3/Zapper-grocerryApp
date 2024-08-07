@@ -7,6 +7,9 @@ import 'package:zapper/Components/HomeBackground.dart';
 import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Components/homeCard.dart';
 import 'package:zapper/Components/specialOffer.dart';
+import 'package:zapper/Screens/categoriesScreen.dart';
+import 'package:zapper/Screens/favouriteScreen.dart';
+import 'package:zapper/Screens/searchScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userEmail;
@@ -21,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final PageController _pageController = PageController();
   int _selectedIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -30,10 +34,27 @@ class _HomeScreenState extends State<HomeScreen> {
     // Navigate to different screens based on the index
     switch (index) {
       case 0:
-        // Navigate to Home screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+              userEmail: widget.userEmail,
+            ),
+          ),
+        );
         break;
       case 1:
-        // Navigate to Favorites screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FavoritesScreen(
+              userEmail: widget.userEmail,
+            ),
+          ),
+        );
+        setState(() {
+          _selectedIndex = 0;
+        });
         break;
       case 2:
         // Navigate to Cart screen
@@ -54,6 +75,20 @@ class _HomeScreenState extends State<HomeScreen> {
       return null;
     }
     return querySnapshot.docs.first.id;
+  }
+
+  void _onSearchSubmitted(String searchText) {
+    if (searchText.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchScreen(
+            productName: searchText,
+            userEmail: widget.userEmail,
+          ),
+        ),
+      );
+    }
   }
 
   Future<List<Map<String, dynamic>>> getSpecialOffers() async {
@@ -117,15 +152,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(12.r),
                             color: Colors.white),
                         child: TextField(
+                          controller: _searchController,
                           decoration: InputDecoration(
-                              hintText: 'Search ',
-                              prefixIcon: Icon(
-                                Icons.search,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              fillColor: Colors.white),
+                            hintText: 'Search',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            fillColor: Colors.white,
+                          ),
+                          onSubmitted:
+                              _onSearchSubmitted, // Call this method on enter key
                         ),
                       ),
                       IconButton(
@@ -276,12 +313,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           return GestureDetector(
                             onTap: () {
                               // Navigate to homeCategories.dart with the document ID
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CategoryScreen(
+                                    initialCategoryId: doc.id,
+                                    userEmail: widget.userEmail,
+                                  ),
+                                ),
+                              );
                             },
                             child: Column(
                               children: [
                                 Container(
-                                  width: 70,
-                                  height: 70,
+                                  width: 61.w,
+                                  height: 53.h,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
                                     image: DecorationImage(

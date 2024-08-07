@@ -43,11 +43,11 @@ class MyApp extends StatelessWidget {
             theme: ThemeData.light(), // Default light theme
             darkTheme: ThemeData.dark(), // Default dark theme
             themeMode: ThemeMode.system,
-            home: SplashScreen(),
+            //  home: SplashScreen(),
             // Use the system theme
-            // home: HomeScreen(
-            //   userEmail: 'f190231@nu.edu.pk',
-            // ),
+            home: HomeScreen(
+              userEmail: 'f190231@nu.edu.pk',
+            ),
           ),
         );
       },
