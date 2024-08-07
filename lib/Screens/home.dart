@@ -9,12 +9,13 @@ import 'package:zapper/Components/homeCard.dart';
 import 'package:zapper/Components/specialOffer.dart';
 import 'package:zapper/Screens/categoriesScreen.dart';
 import 'package:zapper/Screens/favouriteScreen.dart';
+import 'package:zapper/Screens/profile.dart';
 import 'package:zapper/Screens/searchScreen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String userEmail;
+  final String userId;
 
-  HomeScreen({required this.userEmail});
+  HomeScreen({required this.userId});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -25,21 +26,19 @@ class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
   int _selectedIndex = 0;
   final TextEditingController _searchController = TextEditingController();
+  String? userEmail;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navigate to different screens based on the index
     switch (index) {
       case 0:
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              userEmail: widget.userEmail,
-            ),
+            builder: (context) => HomeScreen(userId: widget.userId),
           ),
         );
         break;
@@ -47,9 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FavoritesScreen(
-              userEmail: widget.userEmail,
-            ),
+            builder: (context) => FavoritesScreen(userId: widget.userId),
           ),
         );
         setState(() {
@@ -60,21 +57,32 @@ class _HomeScreenState extends State<HomeScreen> {
         // Navigate to Cart screen
         break;
       case 3:
-        // Navigate to Profile screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfileScreen(userId: widget.userId),
+          ),
+        );
+        setState(() {
+          _selectedIndex = 0;
+        });
         break;
     }
   }
 
-  Future<String?> getUserIdByEmail() async {
-    var querySnapshot = await firestore
-        .collection('users')
-        .where('email', isEqualTo: widget.userEmail)
-        .get();
-
-    if (querySnapshot.docs.isEmpty) {
+  Future<String?> getUserEmailById() async {
+    try {
+      var userDoc =
+          await firestore.collection('users').doc(widget.userId).get();
+      if (userDoc.exists) {
+        return userDoc.data()?['email'] as String?;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching user email: $e');
       return null;
     }
-    return querySnapshot.docs.first.id;
   }
 
   void _onSearchSubmitted(String searchText) {
@@ -84,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(
           builder: (context) => SearchScreen(
             productName: searchText,
-            userEmail: widget.userEmail,
+            userId: widget.userId,
           ),
         ),
       );
@@ -103,6 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch user email if needed
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -118,12 +132,12 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 30.h,
             ),
           ],
-        ), // Adjust path as needed
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
-              // Handle notification icon press
+              // Handle logout action
             },
           ),
         ],
@@ -134,7 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
             HomeBackground(
               topColor: AppColors.primaryColor,
               bottomColor: AppColors.whiteColor,
-              // Adjust this value as needed
             ),
             SingleChildScrollView(
               child: Column(
@@ -161,8 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             fillColor: Colors.white,
                           ),
-                          onSubmitted:
-                              _onSearchSubmitted, // Call this method on enter key
+                          onSubmitted: _onSearchSubmitted,
                         ),
                       ),
                       IconButton(
@@ -188,17 +200,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   FutureBuilder<String?>(
-                    future: getUserIdByEmail(),
+                    future: getUserEmailById(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       }
                       if (!snapshot.hasData || snapshot.data == null) {
-                        return Center(child: Text('User not found'));
+                        return Center(child: Text('Email not found'));
                       }
-                      String userId = snapshot.data!;
+                      String? email = snapshot.data;
                       return FutureBuilder<DocumentSnapshot>(
-                        future: firestore.collection('users').doc(userId).get(),
+                        future: firestore
+                            .collection('users')
+                            .doc(widget.userId)
+                            .get(),
                         builder: (context, userSnapshot) {
                           if (userSnapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -219,10 +234,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Icons.location_pin,
                                   color: Colors.white,
                                 ),
-                                Text(
-                                  'Sent to: ${userData['Address']}',
-                                  style: TextStyle(
-                                      fontSize: 16.sp, color: Colors.white),
+                                Container(
+                                  width: 280.w,
+                                  child: Text(
+                                    'Sent to: ${userData['Address']}',
+                                    style: TextStyle(
+                                        fontSize: 16.sp, color: Colors.white),
+                                    maxLines: 2,
+                                  ),
                                 ),
                               ],
                             ),
@@ -312,13 +331,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           var doc = snapshot.data!.docs[index];
                           return GestureDetector(
                             onTap: () {
-                              // Navigate to homeCategories.dart with the document ID
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => CategoryScreen(
                                     initialCategoryId: doc.id,
-                                    userEmail: widget.userEmail,
+                                    userId: widget.userId,
                                   ),
                                 ),
                               );

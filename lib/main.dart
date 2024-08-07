@@ -8,6 +8,8 @@ import 'package:zapper/Screens/adminPanel.dart';
 import 'package:zapper/Screens/home.dart';
 import 'package:zapper/Screens/landingScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:zapper/Screens/login.dart';
+import 'package:zapper/Screens/signup.dart';
 import 'package:zapper/Screens/splashScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:zapper/config.dart';
@@ -43,11 +45,10 @@ class MyApp extends StatelessWidget {
             theme: ThemeData.light(), // Default light theme
             darkTheme: ThemeData.dark(), // Default dark theme
             themeMode: ThemeMode.system,
-            //  home: SplashScreen(),
+            home: SplashScreen(),
+            // home: LandingScreen(),
+            // home: LoginScreen(),
             // Use the system theme
-            home: HomeScreen(
-              userEmail: 'f190231@nu.edu.pk',
-            ),
           ),
         );
       },

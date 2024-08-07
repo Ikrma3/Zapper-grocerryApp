@@ -10,25 +10,6 @@ import 'package:zapper/Components/submitButton.dart';
 import 'package:zapper/Screens/home.dart';
 import 'package:zapper/Screens/adminPanel.dart'; // Import the AdminPanel screen
 
-void main() {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensure Flutter bindings are initialized
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: LoginScreen(), // Set the initial screen
-    );
-  }
-}
-
 class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -44,38 +25,28 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkLoginStatus();
+    });
   }
 
   void _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authToken');
+    User? user = FirebaseAuth.instance.currentUser;
 
-    if (token != null) {
-      try {
-        await FirebaseAuth.instance.signInWithCustomToken(token);
-        User? user = FirebaseAuth.instance.currentUser;
-
-        if (user != null) {
-          String email = user.email!;
-          if (email == 'admin@zapper.com') {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => AdminPanel()),
-            );
-          } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => HomeScreen(
-                        userEmail: email,
-                      )),
-            );
-          }
-        }
-      } catch (e) {
-        // If there's an error (e.g., token expired), clear the token and show login screen
-        prefs.remove('authToken');
+    if (user != null) {
+      if (user.email == 'admin@zapper.com') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AdminPanel()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                    userId: user.uid,
+                  )),
+        );
       }
     }
   }
@@ -98,32 +69,25 @@ class _LoginScreenState extends State<LoginScreen> {
           password: passwordController.text,
         );
 
-        // Save the token
-        String? token = await userCredential.user?.getIdToken();
-        if (token != null) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('authToken', token);
-        }
-
-        // Check if the user is an admin
         if (userCredential.user != null) {
-          // Get user email
-          String email = userCredential.user!.email!;
-          String userId = userCredential.user!.uid; // Get user ID
+          String uid = userCredential.user!.uid; // Get user ID
 
-          if (email == 'admin@zapper.com') {
-            // Navigate to Admin Panel if admin email
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('authToken', uid); // Save the UID as token
+          await prefs.setInt('authTokenExpiration',
+              DateTime.now().add(Duration(days: 30)).millisecondsSinceEpoch);
+
+          if (userCredential.user!.email == 'admin@zapper.com') {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => AdminPanel()),
             );
           } else {
-            // Navigate to Home Screen if not admin, passing userId
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                   builder: (context) => HomeScreen(
-                        userEmail: email,
+                        userId: uid, // Pass UID instead of email
                       )),
             );
           }

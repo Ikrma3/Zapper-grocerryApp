@@ -5,9 +5,9 @@ import 'package:zapper/Screens/productDetailsScreen.dart';
 
 class SearchScreen extends StatefulWidget {
   final String productName;
-  final String userEmail;
+  final String userId; // Changed from userEmail to userId
 
-  SearchScreen({required this.productName, required this.userEmail});
+  SearchScreen({required this.productName, required this.userId});
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -15,7 +15,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   List<DocumentSnapshot> searchResults = [];
-  bool isLoading = false; // Add this line
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void searchProducts() async {
     setState(() {
-      isLoading = true; // Show loading indicator
+      isLoading = true;
     });
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -38,7 +38,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     setState(() {
       searchResults = querySnapshot.docs;
-      isLoading = false; // Hide loading indicator
+      isLoading = false;
     });
   }
 
@@ -49,7 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
         title: Text('Search Results'),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator()) // Show loading indicator
+          ? Center(child: CircularProgressIndicator())
           : Padding(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: GridView.builder(
@@ -64,7 +64,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 2),
                     child: ProductFrame(
                       id: product.id,
-                      userEmail: widget.userEmail,
+                      userId: widget.userId, // Pass userId instead of userEmail
                       name: product['Name'],
                       imageUrls: List<String>.from(product['imageUrls']),
                       price: product['newPrice'],
@@ -75,7 +75,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           MaterialPageRoute(
                             builder: (context) => ProductDetailScreen(
                               productId: product.id,
-                              userEmail: widget.userEmail,
+                              userId: widget
+                                  .userId, // Pass userId instead of userEmail
                             ),
                           ),
                         );

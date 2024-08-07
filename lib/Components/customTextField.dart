@@ -9,6 +9,7 @@ class CustomTextFormField extends StatefulWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
+  final Widget? suffixIcon; // Add suffixIcon parameter
 
   const CustomTextFormField({
     required this.controller,
@@ -17,6 +18,7 @@ class CustomTextFormField extends StatefulWidget {
     this.obscureText = false,
     required this.keyboardType,
     required this.textInputAction,
+    this.suffixIcon, // Add suffixIcon parameter
     super.key,
   });
 
@@ -56,15 +58,16 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             color: widget.errorText != null ? Colors.red : AppColors.greyColor,
             fontSize: 15.sp,
           ),
-          suffixIcon: widget.labelText == "Password"
-              ? GestureDetector(
-                  onTap: _toggleVisibility,
-                  child: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.black,
-                  ),
-                )
-              : null,
+          suffixIcon: widget.suffixIcon ??
+              (widget.labelText == "Password"
+                  ? GestureDetector(
+                      onTap: _toggleVisibility,
+                      child: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.black,
+                      ),
+                    )
+                  : null),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
             borderSide: BorderSide(

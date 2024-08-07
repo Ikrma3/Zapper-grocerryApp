@@ -10,7 +10,7 @@ class ProductFrame extends StatefulWidget {
   final String price;
   final String previousPrice;
   final VoidCallback onTap;
-  final String userEmail;
+  final String userId; // Changed from userEmail to userId
 
   ProductFrame({
     required this.id,
@@ -19,7 +19,7 @@ class ProductFrame extends StatefulWidget {
     required this.price,
     required this.previousPrice,
     required this.onTap,
-    required this.userEmail,
+    required this.userId, // Changed from userEmail to userId
   });
 
   @override
@@ -39,12 +39,11 @@ class _ProductFrameState extends State<ProductFrame> {
   Future<void> _checkIfFavorite() async {
     final userQuery = FirebaseFirestore.instance
         .collection('users')
-        .where('email', isEqualTo: widget.userEmail);
-    final querySnapshot = await userQuery.get();
+        .doc(widget.userId); // Query by userId
+    final userDoc = await userQuery.get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      final userDoc = querySnapshot.docs.first;
-      List<dynamic> favorites = userDoc.data()['favourites'] ?? [];
+    if (userDoc.exists) {
+      List<dynamic> favorites = userDoc.data()?['favourites'] ?? [];
 
       setState(() {
         isFavorite = favorites.contains(widget.id);
@@ -55,12 +54,11 @@ class _ProductFrameState extends State<ProductFrame> {
   Future<void> _toggleFavorite() async {
     final userQuery = FirebaseFirestore.instance
         .collection('users')
-        .where('email', isEqualTo: widget.userEmail);
-    final querySnapshot = await userQuery.get();
+        .doc(widget.userId); // Query by userId
+    final userDoc = await userQuery.get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      final userDoc = querySnapshot.docs.first;
-      List<dynamic> favorites = userDoc.data()['favourites'] ?? [];
+    if (userDoc.exists) {
+      List<dynamic> favorites = userDoc.data()?['favourites'] ?? [];
 
       if (isFavorite) {
         favorites.remove(widget.id);
@@ -74,29 +72,25 @@ class _ProductFrameState extends State<ProductFrame> {
 
       await userDoc.reference.update({'favourites': favorites});
     } else {
-      // Handle the case where no user with the given email is found
-      print('No user found with email: ${widget.userEmail}');
+      print('No user found with ID: ${widget.userId}');
     }
   }
 
   Future<void> addToCart(String productId, int quantity) async {
     final userQuery = FirebaseFirestore.instance
         .collection('users')
-        .where('email', isEqualTo: widget.userEmail);
+        .doc(widget.userId); // Query by userId
 
-    final querySnapshot = await userQuery.get();
+    final userDoc = await userQuery.get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      final userDoc = querySnapshot.docs.first;
-
-      List<dynamic> cart = userDoc.data()['cart'] ?? [];
+    if (userDoc.exists) {
+      List<dynamic> cart = userDoc.data()?['cart'] ?? [];
 
       cart.add({'productId': productId, 'quantity': quantity});
 
       await userDoc.reference.update({'cart': cart});
     } else {
-      // Handle the case where no user with the given email is found
-      print('No user found with email: ${widget.userEmail}');
+      print('No user found with ID: ${widget.userId}');
     }
   }
 

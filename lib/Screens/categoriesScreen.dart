@@ -7,9 +7,9 @@ import 'package:zapper/Screens/productDetailsScreen.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String initialCategoryId;
-  final String userEmail;
+  final String userId; // Changed from userEmail to userId
 
-  CategoryScreen({required this.initialCategoryId, required this.userEmail});
+  CategoryScreen({required this.initialCategoryId, required this.userId});
 
   @override
   _CategoryScreenState createState() => _CategoryScreenState();
@@ -177,7 +177,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 2.w),
                     child: ProductFrame(
                       id: product.id,
-                      userEmail: widget.userEmail,
+                      userId: widget.userId, // Changed from userEmail to userId
                       name: product['Name'],
                       imageUrls: List<String>.from(product['imageUrls']),
                       price: product['newPrice'],
@@ -188,7 +188,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           MaterialPageRoute(
                             builder: (context) => ProductDetailScreen(
                               productId: product.id,
-                              userEmail: widget.userEmail,
+                              userId: widget
+                                  .userId, // Changed from userEmail to userId
                             ),
                           ),
                         );

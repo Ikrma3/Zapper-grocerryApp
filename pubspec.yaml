@@ -49,6 +49,11 @@ dependencies:
   firebase_storage: ^12.1.2
   shared_preferences: ^2.3.1
   smooth_page_indicator: ^1.2.0+3
+  google_maps_flutter: ^2.8.0
+  geocoding: ^3.0.0
+  flutter_map: ^7.0.2
+  permission_handler: ^11.3.1
+  geolocator: ^12.0.0
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +85,7 @@ flutter:
     - images/fb.png
     - images/logo.png
     - images/getStart.png
+    - images/profile_icon.jpg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

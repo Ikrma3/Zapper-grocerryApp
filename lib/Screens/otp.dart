@@ -5,9 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zapper/Components/background.dart';
 import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Screens/home.dart';
@@ -15,7 +15,6 @@ import 'package:zapper/Screens/login.dart';
 import 'dart:convert';
 
 import 'package:zapper/Screens/signup.dart';
-import 'package:zapper/config.dart'; // For utf8.encode
 
 class OTPScreen extends StatefulWidget {
   final String fullName;
@@ -23,170 +22,67 @@ class OTPScreen extends StatefulWidget {
   final String phone;
   final String password;
   final String Address;
-  String otp;
+  final String otp;
+  final LatLng coordinates;
 
-  OTPScreen({
+  const OTPScreen({
+    Key? key,
     required this.fullName,
     required this.email,
     required this.phone,
     required this.password,
     required this.Address,
     required this.otp,
-  });
+    required this.coordinates,
+  }) : super(key: key);
 
   @override
-  _OTPScreenState createState() => _OTPScreenState();
+  State<OTPScreen> createState() => _OTPScreenState();
 }
 
 class _OTPScreenState extends State<OTPScreen> {
-  late String email;
-  List<TextEditingController> otpControllers =
-      List.generate(4, (_) => TextEditingController());
-  Timer? _timer;
-  int _start = 60;
-  bool _isButtonActive = false;
+  final TextEditingController otpController = TextEditingController();
+  String? otpError;
 
-  @override
-  void initState() {
-    super.initState();
-    email = widget.email;
-    startTimer();
-  }
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void startTimer() {
-    _isButtonActive = false;
-    _start = 60;
-    _timer?.cancel();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (_start == 0) {
-        setState(() {
-          _isButtonActive = true;
-        });
-        timer.cancel();
-      } else {
-        setState(() {
-          _start--;
-        });
-      }
+  Future<void> _verifyOTP() async {
+    setState(() {
+      otpError = otpController.text == widget.otp ? null : 'Invalid OTP';
     });
-  }
 
-  bool _isAllOtpFilled() {
-    return otpControllers.every((controller) => controller.text.isNotEmpty);
-  }
-
-  String hashPassword(String password) {
-    final bytes = utf8.encode(password); // Convert password to bytes
-    final digest = sha256.convert(bytes); // Hash the bytes
-    return digest.toString(); // Convert hash to string
-  }
-
-  Future<void> _storeUserData() async {
-    final userCollection = FirebaseFirestore.instance.collection('users');
-    await userCollection.add({
-      'fullName': widget.fullName,
-      'email': widget.email,
-      'phone': widget.phone,
-      'password': hashPassword(widget.password),
-      'Address': widget.Address, // Hash the password
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  Future<void> _verifyOtp() async {
-    String enteredOtp =
-        otpControllers.map((controller) => controller.text).join('');
-    if (enteredOtp == widget.otp) {
+    if (otpError == null) {
       try {
+        // Create user in Firebase Auth
         UserCredential userCredential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            await _auth.createUserWithEmailAndPassword(
           email: widget.email,
           password: widget.password,
         );
-        await _storeUserData();
-        Navigator.push(
+
+        // Save user data in Firestore
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'fullName': widget.fullName,
+          'email': widget.email,
+          'phone': widget.phone,
+          'Address': widget.Address,
+          'coordinates': {
+            'latitude': widget.coordinates.latitude,
+            'longitude': widget.coordinates.longitude,
+          },
+        });
+
+        // Navigate to home screen
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
         );
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'email-already-in-use') {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('User Already Exists'),
-                content: Text(
-                    'The email address is already in use by another account.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignupScreen()),
-                      ); // Navigate to signup screen
-                    },
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to create user: ${e.message}')),
-          );
-        }
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Wrong OTP')),
-      );
-    }
-  }
-
-  void _resendOtp() {
-    final otp = generateOTP();
-    setState(() {
-      widget.otp = otp;
-    });
-    sendOTPEmail(widget.email, otp);
-    startTimer();
-  }
-
-  String generateOTP() {
-    final otp = (1000 +
-            (9999 - 1000) *
-                (DateTime.now().millisecondsSinceEpoch % 1000) /
-                1000)
-        .round();
-    return otp.toString();
-  }
-
-  Future<void> sendOTPEmail(String email, String otp) async {
-    final username = Config.email;
-    final password = Config.googleAppId;
-    final smtpServer = gmail(username!, password!);
-
-    final message = Message()
-      ..from = Address(username, 'Your App Name')
-      ..recipients.add(email)
-      ..subject = 'Your OTP Code'
-      ..text = 'Your OTP code is $otp';
-
-    try {
-      final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
-    } on MailerException catch (e) {
-      print('Message not sent. \n' + e.toString());
-      for (var p in e.problems) {
-        print('Problem: ${p.code}: ${p.msg}');
+      } catch (e) {
+        print('Error during OTP verification: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to verify OTP: ${e.toString()}')),
+        );
       }
     }
   }
@@ -218,84 +114,31 @@ class _OTPScreenState extends State<OTPScreen> {
                           Text(
                             "Enter OTP",
                             style: TextStyle(
-                                fontSize: 34.sp,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'Inter',
-                                color: Colors.white),
+                              fontSize: 34.sp,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Inter',
+                              color: Colors.white,
+                            ),
                           ),
-                          Spacer(),
                         ],
                       ),
                       SizedBox(height: 24.h),
-                      Text(
-                        'An OTP has been sent to your email',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.white,
+                      TextField(
+                        controller: otpController,
+                        decoration: InputDecoration(
+                          labelText: 'OTP',
+                          errorText: otpError,
+                          border: OutlineInputBorder(),
                         ),
-                      ),
-                      SizedBox(height: 24.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(4, (index) {
-                          return Container(
-                            width: 60.w,
-                            child: TextField(
-                              controller: otpControllers[index],
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              maxLength: 1,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              decoration: InputDecoration(
-                                counterText: '',
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: BorderSide(
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ),
-                              ),
-                              onChanged: (value) {
-                                if (value.length == 1 && index < 3) {
-                                  FocusScope.of(context).nextFocus();
-                                }
-                                if (_isAllOtpFilled()) {
-                                  _verifyOtp();
-                                }
-                              },
-                            ),
-                          );
-                        }),
-                      ),
-                      SizedBox(height: 24.h),
-                      ElevatedButton(
-                        onPressed: _isButtonActive ? _resendOtp : null,
-                        child: Text(
-                          'Resend OTP',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontFamily: 'Inter'),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                       ),
                       SizedBox(height: 16.h),
-                      Text(
-                        'Resend OTP in $_start seconds',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.white,
-                        ),
+                      ElevatedButton(
+                        onPressed: _verifyOTP,
+                        child: Text('Verify OTP'),
                       ),
                     ],
                   ),

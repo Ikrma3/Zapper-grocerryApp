@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:zapper/Components/background.dart';
 import 'package:zapper/Components/colours.dart';
-import 'package:zapper/Components/googleSignin.dart';
 import 'package:zapper/Components/submitButton.dart';
 import 'package:zapper/Screens/getStart.dart';
 import 'package:zapper/Screens/home.dart';
 import 'package:zapper/Screens/login.dart';
 import 'package:zapper/Screens/signup.dart';
+import 'package:zapper/Components/googleSignin.dart';
 
 class LandingScreen extends StatelessWidget {
   @override
@@ -22,7 +20,6 @@ class LandingScreen extends StatelessWidget {
             Background(
               topColor: AppColors.primaryColor,
               bottomColor: AppColors.whiteColor,
-              // Adjust this value as needed
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -86,12 +83,12 @@ class LandingScreen extends StatelessWidget {
                           Expanded(
                             child: Divider(
                               color: AppColors.greyColor,
-                              thickness: 1, // You can adjust the thickness here
+                              thickness: 1,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0), // Adjust padding as needed
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               'or login with-',
                               style: TextStyle(
@@ -103,7 +100,7 @@ class LandingScreen extends StatelessWidget {
                           Expanded(
                             child: Divider(
                               color: AppColors.greyColor,
-                              thickness: 1, // You can adjust the thickness here
+                              thickness: 1,
                             ),
                           ),
                         ],
@@ -120,17 +117,18 @@ class LandingScreen extends StatelessWidget {
                           final provider = Provider.of<GooglesigninProvider>(
                               context,
                               listen: false);
-                          String? userEmail = await provider.googleLogin();
-                          if (userEmail != null) {
+                          Map<String, String>? userInfo =
+                              await provider.googleLogin();
+
+                          if (userInfo != null) {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    HomeScreen(userEmail: userEmail),
+                                    HomeScreen(userId: userInfo['uid']!),
                               ),
                             );
                           } else {
-                            // Handle sign-in failure
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Google Sign-In failed')),
                             );

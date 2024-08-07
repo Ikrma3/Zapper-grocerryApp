@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zapper/Screens/landingScreen.dart';
 import 'package:zapper/Screens/adminPanel.dart';
+import 'package:zapper/Screens/home.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -27,8 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (user != null) {
       // User is signed in, navigate based on email
-      String email = user.email!;
-      if (email == 'admin@zapper.com') {
+      if (user.email == 'admin@zapper.com') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => AdminPanel()),
@@ -36,11 +37,11 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LandingScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen(userId: user.uid)),
         );
       }
     } else {
-      // No user is signed in, navigate to login screen
+      // No user is signed in, navigate to landing screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LandingScreen()),

@@ -4,9 +4,9 @@ import 'package:zapper/Components/productFrame.dart';
 import 'package:zapper/Screens/productDetailsScreen.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  final String userEmail;
+  final String userId;
 
-  FavoritesScreen({required this.userEmail});
+  FavoritesScreen({required this.userId});
 
   @override
   _FavoritesScreenState createState() => _FavoritesScreenState();
@@ -15,25 +15,31 @@ class FavoritesScreen extends StatefulWidget {
 class _FavoritesScreenState extends State<FavoritesScreen> {
   List<DocumentSnapshot> favoriteProducts = [];
   bool isLoading = true;
+  String? userEmail;
 
   @override
   void initState() {
     super.initState();
-    _loadFavoriteProducts();
+    _loadUserEmailAndFavorites();
   }
 
-  Future<void> _loadFavoriteProducts() async {
+  Future<void> _loadUserEmailAndFavorites() async {
     try {
-      final userQuery = FirebaseFirestore.instance
+      // Fetch user data from Firestore using UID
+      final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .where('email', isEqualTo: widget.userEmail);
-      final userSnapshot = await userQuery.get();
+          .doc(widget.userId)
+          .get();
 
-      if (userSnapshot.docs.isNotEmpty) {
-        final userDoc = userSnapshot.docs.first;
-        List<dynamic> favoriteIds = userDoc.data()['favourites'] ?? [];
+      if (userDoc.exists) {
+        setState(() {
+          userEmail = userDoc.data()?['email'];
+        });
+
+        List<dynamic> favoriteIds = userDoc.data()?['favourites'] ?? [];
 
         if (favoriteIds.isNotEmpty) {
+          // Fetch favorite products
           final productQuery = FirebaseFirestore.instance
               .collection('products')
               .where(FieldPath.documentId, whereIn: favoriteIds);
@@ -86,8 +92,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       return Padding(
                         padding: EdgeInsets.symmetric(horizontal: 2),
                         child: ProductFrame(
+                          userId: widget.userId,
                           id: product.id,
-                          userEmail: widget.userEmail,
+                          // Use userEmail if needed
                           name: product['Name'],
                           imageUrls: List<String>.from(product['imageUrls']),
                           price: product['newPrice'],
@@ -98,7 +105,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               MaterialPageRoute(
                                 builder: (context) => ProductDetailScreen(
                                   productId: product.id,
-                                  userEmail: widget.userEmail,
+                                  userId: widget
+                                      .userId, // Pass UID to ProductDetailScreen
                                 ),
                               ),
                             );

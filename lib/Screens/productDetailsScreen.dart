@@ -5,9 +5,9 @@ import 'package:zapper/Components/colours.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
-  final String userEmail;
+  final String userId; // Changed from userEmail to userId
 
-  ProductDetailScreen({required this.productId, required this.userEmail});
+  ProductDetailScreen({required this.productId, required this.userId});
 
   @override
   _ProductDetailScreenState createState() => _ProductDetailScreenState();
@@ -35,27 +35,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> addToCart(String productId, int quantity) async {
-    final userQuery = FirebaseFirestore.instance.collection('users').where(
-        'email',
-        isEqualTo: widget.userEmail); // Use the actual user email field
+    try {
+      // Fetch user document using UID
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userId)
+          .get();
 
-    final querySnapshot = await userQuery.get();
+      if (userDoc.exists) {
+        // Get the existing cart or initialize it as an empty list
+        List<dynamic> cart = userDoc.data()?['cart'] ?? [];
 
-    if (querySnapshot.docs.isNotEmpty) {
-      final userDoc = querySnapshot.docs
-          .first; // Assuming there's only one document with the given email
+        // Add the new product to the cart
+        cart.add({'productId': productId, 'quantity': quantity});
 
-      // Get the existing cart or initialize it as an empty list
-      List<dynamic> cart = userDoc.data()['cart'] ?? [];
-
-      // Add the new product to the cart
-      cart.add({'productId': productId, 'quantity': quantity});
-
-      // Update the user document with the new cart
-      await userDoc.reference.update({'cart': cart});
-    } else {
-      // Handle the case where no user with the given email is found
-      print('No user found with email: ${widget.userEmail}');
+        // Update the user document with the new cart
+        await userDoc.reference.update({'cart': cart});
+      } else {
+        print('No user found with UID: ${widget.userId}');
+      }
+    } catch (e) {
+      print('Error adding to cart: $e');
     }
   }
 
@@ -275,7 +275,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           MaterialPageRoute(
                             builder: (context) => ProductDetailScreen(
                               productId: productId,
-                              userEmail: widget.userEmail,
+                              userId: widget.userId, // Pass UID
                             ),
                           ),
                         );
