@@ -6,10 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Components/viewAddressMap.dart';
+import 'package:zapper/Screens/cartScreen.dart';
 import 'package:zapper/Screens/editProfile.dart';
 import 'package:zapper/Screens/favouriteScreen.dart';
 import 'package:zapper/Screens/landingScreen.dart';
-import 'package:zapper/Screens/login.dart'; // Ensure you import the LoginScreen
+import 'package:zapper/Screens/login.dart';
+import 'package:zapper/Screens/myOrders.dart'; // Ensure you import the LoginScreen
 
 class ProfileScreen extends StatefulWidget {
   final String userId; // Changed from userEmail to userId
@@ -189,7 +191,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       leading: Icon(Icons.shopping_bag),
                       title: Text('My Orders'),
                       onTap: () {
-                        // Navigate to My Orders Screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyOrder(uid: widget.userId),
+                          ),
+                        );
                       },
                     );
                   case 2:

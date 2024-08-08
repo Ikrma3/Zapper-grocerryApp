@@ -7,6 +7,7 @@ import 'package:zapper/Components/HomeBackground.dart';
 import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Components/homeCard.dart';
 import 'package:zapper/Components/specialOffer.dart';
+import 'package:zapper/Screens/cartScreen.dart';
 import 'package:zapper/Screens/categoriesScreen.dart';
 import 'package:zapper/Screens/favouriteScreen.dart';
 import 'package:zapper/Screens/profile.dart';
@@ -54,7 +55,15 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         break;
       case 2:
-        // Navigate to Cart screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CartScreen(uid: widget.userId),
+          ),
+        );
+        setState(() {
+          _selectedIndex = 0;
+        });
         break;
       case 3:
         Navigator.push(
