@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:zapper/Components/productFrame.dart';
 import 'package:zapper/Screens/productDetailsScreen.dart';
 
@@ -84,13 +85,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   child: GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 2 / 3,
+                      childAspectRatio: (1.sw / 2.1) / (0.4.sh),
                     ),
                     itemCount: favoriteProducts.length,
                     itemBuilder: (context, index) {
                       DocumentSnapshot product = favoriteProducts[index];
                       return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 2.w, vertical: 10.h),
                         child: ProductFrame(
                           userId: widget.userId,
                           id: product.id,

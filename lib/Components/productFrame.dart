@@ -10,7 +10,7 @@ class ProductFrame extends StatefulWidget {
   final String price;
   final String previousPrice;
   final VoidCallback onTap;
-  final String userId; // Changed from userEmail to userId
+  final String userId;
 
   ProductFrame({
     required this.id,
@@ -19,7 +19,7 @@ class ProductFrame extends StatefulWidget {
     required this.price,
     required this.previousPrice,
     required this.onTap,
-    required this.userId, // Changed from userEmail to userId
+    required this.userId,
   });
 
   @override
@@ -37,24 +37,24 @@ class _ProductFrameState extends State<ProductFrame> {
   }
 
   Future<void> _checkIfFavorite() async {
-    final userQuery = FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.userId); // Query by userId
+    final userQuery =
+        FirebaseFirestore.instance.collection('users').doc(widget.userId);
     final userDoc = await userQuery.get();
 
     if (userDoc.exists) {
       List<dynamic> favorites = userDoc.data()?['favourites'] ?? [];
 
-      setState(() {
-        isFavorite = favorites.contains(widget.id);
-      });
+      if (mounted) {
+        setState(() {
+          isFavorite = favorites.contains(widget.id);
+        });
+      }
     }
   }
 
   Future<void> _toggleFavorite() async {
-    final userQuery = FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.userId); // Query by userId
+    final userQuery =
+        FirebaseFirestore.instance.collection('users').doc(widget.userId);
     final userDoc = await userQuery.get();
 
     if (userDoc.exists) {
@@ -66,9 +66,11 @@ class _ProductFrameState extends State<ProductFrame> {
         favorites.add(widget.id);
       }
 
-      setState(() {
-        isFavorite = !isFavorite;
-      });
+      if (mounted) {
+        setState(() {
+          isFavorite = !isFavorite;
+        });
+      }
 
       await userDoc.reference.update({'favourites': favorites});
     } else {
@@ -77,9 +79,8 @@ class _ProductFrameState extends State<ProductFrame> {
   }
 
   Future<void> addToCart(String productId, int quantity) async {
-    final userQuery = FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.userId); // Query by userId
+    final userQuery =
+        FirebaseFirestore.instance.collection('users').doc(widget.userId);
 
     final userDoc = await userQuery.get();
 
@@ -162,7 +163,7 @@ class _ProductFrameState extends State<ProductFrame> {
                   ),
                 Spacer(),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w),
+                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 5.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -199,9 +200,11 @@ class _ProductFrameState extends State<ProductFrame> {
                           size: 20.w.h,
                         ),
                         onPressed: () {
-                          setState(() {
-                            quantity++;
-                          });
+                          if (mounted) {
+                            setState(() {
+                              quantity++;
+                            });
+                          }
                         },
                       ),
                     ],
@@ -210,7 +213,7 @@ class _ProductFrameState extends State<ProductFrame> {
               ],
             ),
             Positioned(
-              top: 8.h,
+              top: 6.h,
               right: 8.w,
               child: IconButton(
                 icon: Icon(

@@ -3,7 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Components/productFrame.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zapper/Screens/filterScreen.dart';
 import 'package:zapper/Screens/productDetailsScreen.dart';
+import 'package:zapper/Screens/searchScreen.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String initialCategoryId;
@@ -20,6 +22,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   List<DocumentSnapshot> products = [];
   late String selectedCategoryId;
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -53,6 +56,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
     });
   }
 
+  void _onSearchSubmitted(String searchText) {
+    if (searchText.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchScreen(
+            productName: searchText,
+            userId: widget.userId,
+          ),
+        ),
+      );
+    }
+  }
+
   void scrollToSelectedCategory() {
     int selectedIndex =
         categories.indexWhere((category) => category.id == selectedCategoryId);
@@ -80,15 +97,38 @@ class _CategoryScreenState extends State<CategoryScreen> {
               borderRadius: BorderRadius.circular(12.r),
               color: Color.fromRGBO(242, 242, 242, 1)),
           child: TextField(
+            controller: _searchController,
             decoration: InputDecoration(
-                hintText: 'Search for fruits, vegetables... ',
-                prefixIcon: Icon(
-                  Icons.search,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                fillColor: Colors.white),
+              hintText: 'Search for fruits, vegetables... ',
+              prefixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.search),
+                ],
+              ),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.filter_list),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              FilterScreen(uid: widget.userId),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              fillColor: Colors.white,
+            ),
+            onSubmitted: _onSearchSubmitted,
           ),
         ),
         actions: [
@@ -168,13 +208,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 2.5 / 3.1.h,
+                  childAspectRatio: (1.sw / 2.1) / (0.4.sh),
                 ),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   DocumentSnapshot product = products[index];
                   return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2.w),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 2.w, vertical: 10.h),
                     child: ProductFrame(
                       id: product.id,
                       userId: widget.userId, // Changed from userEmail to userId

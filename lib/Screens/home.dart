@@ -10,6 +10,7 @@ import 'package:zapper/Components/specialOffer.dart';
 import 'package:zapper/Screens/cartScreen.dart';
 import 'package:zapper/Screens/categoriesScreen.dart';
 import 'package:zapper/Screens/favouriteScreen.dart';
+import 'package:zapper/Screens/moreCategory.dart';
 import 'package:zapper/Screens/profile.dart';
 import 'package:zapper/Screens/searchScreen.dart';
 
@@ -129,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppColors.primaryColor,
         title: Row(
           children: [
@@ -142,14 +144,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              // Handle logout action
-            },
-          ),
-        ],
       ),
       body: SafeArea(
         child: Stack(
@@ -246,9 +240,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   width: 280.w,
                                   child: Text(
-                                    'Sent to: ${userData['Address']}',
+                                    userData['Address'].isEmpty
+                                        ? 'Go to edit profile and add your address'
+                                        : 'Sent to: ${userData['Address']}',
                                     style: TextStyle(
-                                        fontSize: 16.sp, color: Colors.white),
+                                      fontSize: 16.sp,
+                                      color: Colors.white,
+                                    ),
                                     maxLines: 2,
                                   ),
                                 ),
@@ -380,7 +378,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     alignment: Alignment.center,
                     child: TextButton(
                       onPressed: () {
-                        // Navigate to MoreScreen.dart
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MoreCategoryScreen(userId: widget.userId),
+                          ),
+                        );
                       },
                       child: Text(
                         'More',

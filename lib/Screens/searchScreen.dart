@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:zapper/Components/productFrame.dart';
 import 'package:zapper/Screens/productDetailsScreen.dart';
 
@@ -51,17 +52,18 @@ class _SearchScreenState extends State<SearchScreen> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 2 / 3.1,
+                  childAspectRatio: (1.sw / 2.1) / (0.4.sh),
                 ),
                 itemCount: searchResults.length,
                 itemBuilder: (context, index) {
                   DocumentSnapshot product = searchResults[index];
                   return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 2.w, vertical: 10.h),
                     child: ProductFrame(
                       id: product.id,
                       userId: widget.userId, // Pass userId instead of userEmail

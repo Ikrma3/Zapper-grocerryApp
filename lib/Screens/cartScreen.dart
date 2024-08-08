@@ -118,7 +118,21 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     if (cart.isEmpty) {
-      return Scaffold(body: Center(child: Text('You have nothing in cart')));
+      return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios_new),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomeScreen(userId: widget.uid),
+                  ),
+                );
+              },
+            ),
+          ),
+          body: Center(child: Text('You have nothing in cart')));
     }
 
     return Scaffold(

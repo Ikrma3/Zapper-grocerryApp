@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,7 +14,6 @@ import 'package:zapper/Components/submitButton.dart';
 import 'package:zapper/Screens/otp.dart';
 import 'package:zapper/config.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,7 +29,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String address = "";
-  late LatLng _selectedCoordinates;
+  LatLng _selectedCoordinates = LatLng(0.0, 0.0);
 
   String? emailError;
   String? passwordError;
@@ -159,20 +159,31 @@ class _SignupScreenState extends State<SignupScreen> {
     if (position != null) {
       LatLng initialLocation = LatLng(position.latitude, position.longitude);
 
-      await Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => MapScreen(
             initialPosition: initialLocation,
-            onLocationSelected: (String address, LatLng coordinates) {
+            onLocationSelected: (selectedAddress, slectedCordinates) {
               setState(() {
-                this.address = address;
-                this._selectedCoordinates = coordinates;
+                address = selectedAddress;
+                _selectedCoordinates = slectedCordinates;
+                print('Updated Ch Coordinates: $_selectedCoordinates');
+                print(
+                    'Updated Ch /n \n \n /n /n Coordinates: $_selectedCoordinates');
               });
             },
           ),
         ),
       );
+
+      if (result != null) {
+        setState(() {
+          address = result['address'];
+          _selectedCoordinates = result['coordinates'];
+          print('Updated from result: $_selectedCoordinates');
+        });
+      }
     }
   }
 
@@ -194,88 +205,90 @@ class _SignupScreenState extends State<SignupScreen> {
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Center(
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 60.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Signup",
-                            style: TextStyle(
-                              fontSize: 34.sp,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Inter',
-                              color: Colors.white,
-                            ),
+                  child: Column(children: [
+                    SizedBox(height: 60.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Signup",
+                          style: TextStyle(
+                            fontSize: 34.sp,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Inter',
+                            color: Colors.white,
                           ),
-                          Spacer(),
-                          Image.asset(
-                            'images/login.png',
-                            height: 317.h,
-                            width: 158.w,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24.h),
-                      CustomTextFormField(
-                        labelText: 'Full Name',
-                        controller: fullNameController,
-                        errorText: nameError,
-                        keyboardType: TextInputType.name,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      SizedBox(height: 16.h),
-                      CustomTextFormField(
-                        labelText: 'Email',
-                        controller: emailController,
-                        errorText: emailError,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      SizedBox(height: 15.h),
-                      CustomTextFormField(
-                        labelText: 'Phone',
-                        controller: phoneController,
-                        errorText: phoneError,
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      SizedBox(height: 15.h),
-                      CustomTextFormField(
-                        labelText: 'Password',
-                        obscureText: true,
-                        controller: passwordController,
-                        errorText: passwordError,
-                        keyboardType: TextInputType.visiblePassword,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      SizedBox(height: 15.h),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: AppColors.secondaryColor,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 12.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          minimumSize: Size(240.w, 35.h),
                         ),
-                        onPressed: _openMapScreen,
-                        child: Text('Select Address'),
+                        Spacer(),
+                        Image.asset(
+                          'images/login.png',
+                          height: 317.h,
+                          width: 158.w,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 24.h),
+                    CustomTextFormField(
+                      labelText: 'Full Name',
+                      controller: fullNameController,
+                      errorText: nameError,
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(height: 16.h),
+                    CustomTextFormField(
+                      labelText: 'Email',
+                      controller: emailController,
+                      errorText: emailError,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(height: 15.h),
+                    CustomTextFormField(
+                      labelText: 'Phone',
+                      controller: phoneController,
+                      errorText: phoneError,
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(height: 15.h),
+                    CustomTextFormField(
+                      labelText: 'Password',
+                      obscureText: true,
+                      controller: passwordController,
+                      errorText: passwordError,
+                      keyboardType: TextInputType.visiblePassword,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(height: 15.h),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.secondaryColor,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 12.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        minimumSize: Size(240.w, 35.h),
                       ),
-                      SizedBox(height: 10.h),
-                      SubmitButton(
+                      onPressed: _openMapScreen,
+                      child: Text('Select Address'),
+                    ),
+                    SizedBox(height: 10.h),
+                    SubmitButton(
                         color: AppColors.primaryColor,
                         borderColor: AppColors.primaryColor,
                         text: 'Signup',
                         textColor: AppColors.whiteColor,
                         height: 40.h,
-                        onPressed: validateSignup,
-                      ),
-                    ],
-                  ),
+                        onPressed: () {
+                          print(
+                              'Updated Ch Coordinates: $_selectedCoordinates');
+
+                          // validateSignup();
+                        })
+                  ]),
                 ),
               ),
             ),

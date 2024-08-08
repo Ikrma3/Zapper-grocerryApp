@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:zapper/Components/colours.dart';
 import 'package:zapper/Components/orderFrame.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zapper/Screens/home.dart';
 
 class MyOrder extends StatefulWidget {
   final String uid;
@@ -78,11 +79,25 @@ class _MyOrderState extends State<MyOrder> {
           Column(
             children: [
               AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                title: Text('Orders', style: TextStyle(color: Colors.black)),
-                centerTitle: true,
-              ),
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  title: Text('Orders', style: TextStyle(color: Colors.black)),
+                  centerTitle: true,
+                  leading: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(userId: widget.uid),
+                        ),
+                      );
+                    },
+                  )),
               Expanded(
                 child: DefaultTabController(
                   length: 2,

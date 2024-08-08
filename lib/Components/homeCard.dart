@@ -117,8 +117,8 @@ class HomeCard extends StatelessWidget {
                           height: 10.h,
                         ),
                         Container(
-                          width: 95.w,
-                          height: 18.h,
+                          width: 110.w,
+                          height: 20.h,
                           child: ElevatedButton(
                             onPressed: () {
                               // Uncomment and complete the navigation logic as needed
