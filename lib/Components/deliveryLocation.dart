@@ -7,7 +7,7 @@ import 'package:zapper/Components/mapScreen.dart';
 
 class DeliveryLocation extends StatefulWidget {
   final String uid;
-  final Function(LatLng) onLocationUpdated;
+  final Function(LatLng, String) onLocationUpdated;
 
   DeliveryLocation({required this.uid, required this.onLocationUpdated});
 
@@ -39,7 +39,7 @@ class _DeliveryLocationState extends State<DeliveryLocation> {
           userCoordinates = LatLng(latitude, longitude);
         });
         // Send coordinates after fetching the user address
-        widget.onLocationUpdated(userCoordinates);
+        widget.onLocationUpdated(userCoordinates, userAddress);
       }
     } catch (e) {
       print('Error fetching user address: $e');
@@ -57,7 +57,7 @@ class _DeliveryLocationState extends State<DeliveryLocation> {
               userAddress = address;
               userCoordinates = coordinates;
             });
-            widget.onLocationUpdated(userCoordinates);
+            widget.onLocationUpdated(userCoordinates, userAddress);
           },
         ),
       ),
@@ -68,7 +68,7 @@ class _DeliveryLocationState extends State<DeliveryLocation> {
         userAddress = result['address'];
         userCoordinates = result['coordinates'];
       });
-      widget.onLocationUpdated(userCoordinates);
+      widget.onLocationUpdated(userCoordinates, userAddress);
     }
   }
 

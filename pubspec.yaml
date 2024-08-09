@@ -93,6 +93,9 @@ flutter:
     - images/notConfirm.png
     - images/delivered.png
     - images/picked.png
+    - images/support.png
+    - images/tick.png
+    - images/orderComplete.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

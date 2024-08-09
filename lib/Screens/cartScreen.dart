@@ -30,6 +30,7 @@ class _CartScreenState extends State<CartScreen> {
   DateTime? selectedDate;
   String? selectedTime;
   LatLng? deliveryCoordinates;
+  String? deliveryAddress;
   bool paymentDone = false;
   String? paymentMethod;
 
@@ -66,9 +67,10 @@ class _CartScreenState extends State<CartScreen> {
     userDoc.reference.update({'cart': cart});
   }
 
-  void updateDeliveryLocation(LatLng coordinates) {
+  void updateDeliveryLocation(LatLng coordinates, String Address) {
     setState(() {
       deliveryCoordinates = coordinates;
+      deliveryAddress = Address;
     });
     print('Selected Delivery Location: $deliveryCoordinates');
   }
@@ -104,6 +106,7 @@ class _CartScreenState extends State<CartScreen> {
         deliveryCharges: deliveryCharges,
         total: total,
         deliveryCoordinates: deliveryCoordinates!,
+        deliveryAddress: deliveryAddress!,
         paymentDone: paymentDone,
         selectedDate: selectedDate!,
         selectedTime: selectedTime!,

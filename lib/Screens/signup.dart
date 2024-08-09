@@ -286,7 +286,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           print(
                               'Updated Ch Coordinates: $_selectedCoordinates');
 
-                          // validateSignup();
+                          validateSignup();
                         })
                   ]),
                 ),

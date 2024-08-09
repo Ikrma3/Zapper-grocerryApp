@@ -67,10 +67,8 @@ class _OTPScreenState extends State<OTPScreen> {
           'email': widget.email,
           'phone': widget.phone,
           'Address': widget.Address,
-          'coordinates': {
-            'latitude': widget.coordinates.latitude,
-            'longitude': widget.coordinates.longitude,
-          },
+          'latitude': widget.coordinates.latitude,
+          'longitude': widget.coordinates.longitude,
         });
 
         // Navigate to home screen

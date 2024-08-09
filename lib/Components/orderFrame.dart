@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zapper/Screens/orderDetails.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zapper/Screens/orderSchedule.dart';
 
 class OrdersFrame extends StatelessWidget {
   final Map<String, dynamic> order;
@@ -17,15 +18,15 @@ class OrdersFrame extends StatelessWidget {
     String subtitle;
     IconData icon;
     String imageUrl;
-    if (order['isOrderCompleted']) {
-      subtitle = "Your Order is Completed. Please rate the experience";
+    if (order['isOrderConfirmed']) {
+      subtitle = "Your Order is Completed.";
       imageUrl = 'images/delivered.png';
+    } else if (order['isOrderCompleted']) {
+      subtitle = "Your Order is Completed. Waiting for Confirmation";
+      imageUrl = 'images/orderComplete.png';
     } else if (order['orderPicked']) {
       subtitle = "Your Order is Delivering to your home";
       imageUrl = 'images/picked.png';
-    } else if (order['isOrderConfirmed']) {
-      subtitle = "Your Order is Confirmed. Please check everything is okay";
-      imageUrl = 'images/confirmed.png';
     } else {
       subtitle = "Your Order is Being Processed";
       imageUrl = 'images/notConfirm.png';
@@ -60,8 +61,8 @@ class OrdersFrame extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                OrderDetailsScreen(uid: uid, orderNumber: order['orderNumber']),
+            builder: (context) => OrderScheduleDetail(
+                uid: uid, orderNumber: order['orderNumber']),
           ),
         );
       },

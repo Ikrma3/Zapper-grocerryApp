@@ -41,7 +41,7 @@ class _MyOrderState extends State<MyOrder> {
 
         for (var doc in orderQuerySnapshot.docs) {
           var orderData = doc.data();
-          if (orderData['isOrderCompleted'] == false) {
+          if (orderData['isOrderConfirmed'] == false) {
             ongoingOrders.add(orderData);
           } else {
             historyOrders.add(orderData);

@@ -55,9 +55,9 @@ class LandingScreen extends StatelessWidget {
                       ),
                       SubmitButton(
                         color: AppColors.whiteColor,
-                        borderColor: AppColors.secondaryColor,
+                        borderColor: AppColors.darkSecondaryColor,
                         text: 'Signup',
-                        textColor: AppColors.secondaryColor,
+                        textColor: AppColors.darkSecondaryColor,
                         height: 40.h,
                         onPressed: () {
                           Navigator.push(

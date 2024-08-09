@@ -12,6 +12,7 @@ Future<void> placeOrder({
   required LatLng deliveryCoordinates,
   required bool paymentDone,
   required DateTime selectedDate,
+  required String deliveryAddress,
   required String selectedTime,
   required BuildContext context,
   required String? paymentMethod,
@@ -50,6 +51,8 @@ Future<void> placeOrder({
       'paymentMethod': paymentMethod,
       'isOrderConfirmed': false,
       'orderPicked': false,
+      'deliveredAt': '',
+      'deliveryAddress': deliveryAddress,
       'timestamp': now,
     };
 
